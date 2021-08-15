@@ -1,4 +1,96 @@
+#include <string>
+
 #include "lua_api.hpp"
+
+void api_init(lua_State *L)
+{
+    std::cout<<"Initializing lua scripting interface, please stand by...\n";
+    
+    // Std lua libs
+    luaL_openlibs(L);
+    
+    
+    // API functions
+    lua_register(L, "world_getAt",                 world_getAt);
+    lua_register(L, "world_setAt",                 world_setAt);
+    
+    lua_register(L, "entity_newEntity",            entity_newEntity);
+    lua_register(L, "entity_exists",               entity_exists);
+    lua_register(L, "entity_setTexture",           entity_setTexture);
+    lua_register(L, "entity_setAnimationsManager", entity_setAnimationsManager);
+    lua_register(L, "entity_addAnimation",         entity_addAnimation);
+    lua_register(L, "entity_setAnimation",         entity_setAnimation);
+    lua_register(L, "entity_mirror",               entity_mirror);
+    lua_register(L, "entity_setPosition",          entity_setPosition);
+    lua_register(L, "entity_getPosition",          entity_getPosition);
+    lua_register(L, "entity_setSize",              entity_setSize);
+    lua_register(L, "entity_getSize",              entity_getSize);
+    lua_register(L, "entity_getCollisionInfo",     entity_getCollisionInfo);
+    lua_register(L, "entity_setVelocity",          entity_setVelocity);
+    lua_register(L, "entity_getVelocity",          entity_getVelocity);
+    lua_register(L, "entity_delEntity",            entity_delEntity);
+    
+    
+    // Hooks
+    lua_newtable(L);
+    
+    lua_pushstring(L, "update");
+    lua_newtable(L);
+    lua_settable(L, -3);
+    
+    lua_setglobal(L, "hooks");
+    
+    
+    // Metatables
+    // Metatable for entity userdata
+    /*luaL_newmetatable(L, "Entity");
+    
+    lua_pushstring(L, "__index");
+    
+    lua_newtable(L);
+    lua_pushstring(L, "set_texture");
+    lua_pushcfunction(L, entityud_set_texture);
+    lua_settable(L, -3);*/
+    // I'll do it later
+}
+
+void run_script(lua_State *L, const char *filename)
+{
+    int result = luaL_loadfile(L, filename);
+    
+    if (result == LUA_OK)
+    {
+        result = lua_pcall(L, 0, LUA_MULTRET, 0);
+        
+        if (result != LUA_OK)
+        {
+            printerr(L);
+        }
+    }
+    else
+    {
+        printerr(L);
+    }
+}
+
+void run_update_hooks(lua_State *L, float dtime)
+{
+    lua_getglobal(L, "hooks"); // Push hooks
+    
+    lua_pushstring(L, "update");
+    lua_gettable(L, -2); // Push hooks["update"]
+    
+    int update_idx = lua_absindex(L, -1);
+    
+    lua_pushnil(L); // Push first key    
+    while (lua_next(L, update_idx) != 0) // Pop key, push value and key
+    {
+        lua_pushnumber(L, dtime); // Push dtime
+        lua_call(L, 1, 0); // Pop dtime and value (function)
+    }
+    
+    lua_pop(L, 2); // Pop hooks["update"] and hooks
+}
 
 int world_getAt(lua_State *L)
 {
@@ -51,6 +143,20 @@ int entity_newEntity(lua_State *L)
     return 1;
 }
 
+int entity_exists(lua_State *L)
+{
+    check_resources(L);
+    
+    check_lua_argc(L, 1);
+    
+    int id = get_lua_integer(L, 1);
+    Entity *entity = entmgr->getByID(id);
+    
+    lua_pushboolean(L, entity != nullptr);
+    
+    return 1;
+}
+
 int entity_setTexture(lua_State *L)
 {
     check_resources(L);
@@ -58,9 +164,9 @@ int entity_setTexture(lua_State *L)
     check_lua_argc(L, 2);
     
     int id = get_lua_integer(L, 1);
-    const char *filename = lua_tostring(L, 2);
+    std::string filename = lua_tostring(L, 2);
     
-    auto texture = textures->getResource(filename);
+    sf::Texture *texture = textures->getResource(filename);
     
     if (texture == nullptr)
     {
@@ -74,11 +180,91 @@ int entity_setTexture(lua_State *L)
     return 0;
 }
 
+int entity_setAnimationsManager(lua_State *L)
+{
+    check_resources(L);
+    
+    check_lua_argc(L, 2);
+    
+    int id = get_lua_integer(L, 1);
+    Entity *entity = get_entity(L, id);
+    
+    const int animations_idx = 2; // Absolute index in stack
+    
+    AnimationManager animations;
+    
+    lua_pushnil(L); // Push first key
+    while (lua_next(L, animations_idx) != 0) // Pop key, push key and value
+    {
+        std::string name = get_lua_string(L, -2);  // Get key
+        
+        construct_animation(L, name, animations);  // Stack stays same
+        
+        lua_pop(L, 1); // Pop value
+    }
+    
+    entity->animations = animations;
+        
+    return 0;
+}
+
+int entity_addAnimation(lua_State *L)
+{
+    check_resources(L);
+    
+    check_lua_argc(L, 3);
+    
+    int id = get_lua_integer(L, 1);
+    Entity *entity = get_entity(L, id);
+    
+    std::string name = get_lua_string(L, 2);
+    
+    construct_animation(L, name, entity->animations);
+    
+    return 0;
+}
+
+int entity_setAnimation(lua_State *L)
+{
+    check_resources(L);
+    
+    bool has_mirror_arg = check_lua_argc2(L, 2, 3);
+    
+    int id = get_lua_integer(L, 1);
+    Entity *entity = get_entity(L, id);
+    
+    std::string name = get_lua_string(L, 2);
+    
+    if (entity->animations.hasAnimation(name))
+        entity->animations.setAnimation(name);
+    
+    if (has_mirror_arg)
+        entity->animations.mirror = get_lua_bool(L, 3);
+    
+    return 0;
+}
+
+int entity_mirror(lua_State *L)
+{
+    check_resources(L);
+    
+    bool has_mirror_arg = check_lua_argc2(L, 1, 2);
+    
+    int id = get_lua_integer(L, 1);
+    Entity *entity = get_entity(L, id);
+    
+    entity->animations.mirror = ( has_mirror_arg ? get_lua_bool(L, 2) : !entity->animations.mirror );
+    
+    return 0;
+}
+
 int entity_setPosition(lua_State *L)
 {
     check_resources(L);
     
     check_lua_argc(L, 3);
+    
+    //std::cout<<lua_gettop(L);
     
     int id = get_lua_integer(L, 1);
     float x = get_lua_float(L, 2);
