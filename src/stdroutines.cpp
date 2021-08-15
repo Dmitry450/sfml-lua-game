@@ -12,12 +12,14 @@ void run_player_controls(Entity *entity, float dtime, PlayerParams &params)
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
     {
         entity->velocity.x = -params.speed;
-        entity->animations.setAnimation("walk_left");
+        entity->animations.setAnimation("walk");
+        entity->animations.mirror = true;
     }
     else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
     {
         entity->velocity.x = params.speed;
-        entity->animations.setAnimation("walk_right");
+        entity->animations.setAnimation("walk");
+        entity->animations.mirror = false;
     }
     else
     {

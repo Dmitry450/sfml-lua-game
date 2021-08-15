@@ -15,7 +15,7 @@ public:
     
     void update(float dtime);
     
-    void setSpriteRect(sf::Sprite &sprite);
+    void setSpriteRect(sf::Sprite &sprite, bool mirror);
 
 private:
     float frame_timer;
@@ -30,6 +30,10 @@ private:
 class AnimationManager
 {
 public:
+    AnimationManager():
+        mirror(false)
+    {}
+
     void addAnimation(const std::string &name, Animation *animation);
     
     void update(float dtime);
@@ -40,6 +44,16 @@ public:
     {
         current = name;
     }
+    
+    bool hasAnimation(const std::string &name)
+    {
+        auto pair = animations.find(name);
+        
+        return ( pair != animations.end() ? pair->second : nullptr );
+    }
+    
+public:
+    bool mirror;
     
 private:
     std::string current;

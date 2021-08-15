@@ -24,9 +24,17 @@ void Animation::update(float dtime)
     }
 }
 
-void Animation::setSpriteRect(sf::Sprite &sprite)
+void Animation::setSpriteRect(sf::Sprite &sprite, bool mirror)
 {
-    sprite.setTextureRect(animation[frameno]);
+    sf::IntRect rect = sf::IntRect(animation[frameno]);
+    
+    if (mirror)
+    {
+        rect.left += rect.width;
+        rect.width *= -1;
+    }
+    
+    sprite.setTextureRect(rect);
 }
 
 void AnimationManager::addAnimation(const std::string &name, Animation *animation)
@@ -48,7 +56,7 @@ void AnimationManager::update(float dtime)
 void AnimationManager::setSpriteRect(sf::Sprite &sprite)
 {
     if (!animations.empty())
-        animations[current]->setSpriteRect(sprite);
+        animations[current]->setSpriteRect(sprite, mirror);
 }
 
 
