@@ -1,4 +1,5 @@
 #include "world.hpp"
+#include "camera.hpp"
 
 World::World(uint8_t *world, int width, int height)
 {

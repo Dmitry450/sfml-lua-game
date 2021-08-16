@@ -202,7 +202,8 @@ inline void construct_animation(lua_State *L, std::string &name, AnimationManage
 
 void api_init(lua_State *L);
 
-void run_script(lua_State *L, const char *filename);
+// Returns is script was loaded without errors
+bool run_script(lua_State *L, const char *filename);
 
 void run_update_hooks(lua_State *L, float dtime);
 

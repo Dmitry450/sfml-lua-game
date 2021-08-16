@@ -9,8 +9,6 @@
 #include <stdint.h>
 #include <SFML/Graphics.hpp>
 
-#include "camera.hpp"
-
 class World: public sf::Drawable
 {
 public:

@@ -1,4 +1,4 @@
-dofile("scripts/builtin.lua")
+dofile("builtin.lua")
 
 local myentity
 local player

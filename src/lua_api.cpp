@@ -54,7 +54,7 @@ void api_init(lua_State *L)
     // I'll do it later
 }
 
-void run_script(lua_State *L, const char *filename)
+bool run_script(lua_State *L, const char *filename)
 {
     int result = luaL_loadfile(L, filename);
     
@@ -65,12 +65,18 @@ void run_script(lua_State *L, const char *filename)
         if (result != LUA_OK)
         {
             printerr(L);
+            
+            return false;
         }
     }
     else
     {
         printerr(L);
+        
+        return false;
     }
+    
+    return true;
 }
 
 void run_update_hooks(lua_State *L, float dtime)

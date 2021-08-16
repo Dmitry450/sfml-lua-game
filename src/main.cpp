@@ -10,6 +10,8 @@
 #include "lua_api.hpp"
 #include <stdint.h>
 #include <iostream>
+#include <unistd.h>
+#include <cerrno>
 
 Camera camera = { 0, 0 };
 
@@ -17,8 +19,19 @@ World *world = nullptr;
 EntityManager *entmgr = nullptr;
 TextureHolder *textures = nullptr;
 
-int main()
+int main(int argc, char **argv)
 {
+    if (argc != 2)
+    {
+        std::cout<<"Usage: sfmlgame <dir>\n<dir> must have main.lua file\n";
+        return EXIT_FAILURE;
+    }
+    else if (chdir(argv[1]) != 0)
+    {
+        perror("Error opening game directory");
+        return EXIT_FAILURE;
+    }
+    
     sf::RenderWindow window(sf::VideoMode(800, 600), "SFML Game!");
     window.setFramerateLimit(60);
     
@@ -45,8 +58,9 @@ int main()
     
     api_init(L);
     
-    run_script(L, "scripts/test.lua");
-    
+    if (!run_script(L, "main.lua"))
+        return EXIT_FAILURE;
+
     // BEGIN TEST PLAYER CODE
     PlayerParams params;
     params.jump = 400;
