@@ -7,7 +7,7 @@ local x = 0
 
 addHook("update", function(dtime)
     if player == nil then
-        player = Entity.fromid(1, {is_ref = true})
+        player = Player.new()
         player:addAnimation("stand", {
             time_per_frame = 999,
             frames = 1,
