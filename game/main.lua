@@ -54,4 +54,10 @@ addHook("update", function(dtime)
     if x % 60 == 0 then
         myentity:mirror()
     end
+    
+    local player_mouse = player_getMouse()
+    
+    if player_mouse.lmb then
+        myentity:setPosition(player_mouse.x - 16, player_mouse.y - 16)
+    end
 end)

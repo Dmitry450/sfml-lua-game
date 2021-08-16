@@ -30,6 +30,12 @@ void api_init(lua_State *L)
     lua_register(L, "entity_getVelocity",          entity_getVelocity);
     lua_register(L, "entity_delEntity",            entity_delEntity);
     
+    lua_register(L, "player_getEntity",            player_getEntity);
+    lua_register(L, "entity_getKeys",              player_getKeys);
+    lua_register(L, "player_getMouse",             player_getMouse);
+    
+    lua_register(L, "resources_loadTexture",       resources_loadTexture);
+    
     
     // Hooks
     lua_newtable(L);
@@ -439,6 +445,91 @@ int entity_delEntity(lua_State *L)
         
         delete entity;
     }
+    
+    return 0;
+}
+
+int player_getEntity(lua_State *L)
+{
+    check_resources(L);
+    
+    check_lua_argc(L, 0);
+    
+    if (player->entity != nullptr)
+        lua_pushinteger(L, player->entity->getID());
+    else
+        lua_pushinteger(L, 0);
+    
+    return 1;
+}
+
+int player_getKeys(lua_State *L)
+{
+    check_resources(L);
+    
+    check_lua_argc(L, 0);
+    
+    lua_newtable(L);
+    
+    lua_pushstring(L, "left");
+    lua_pushboolean(L, player->left);
+    lua_settable(L, -3);
+    
+    lua_pushstring(L, "right");
+    lua_pushboolean(L, player->right);
+    lua_settable(L, -3);
+    
+    lua_pushstring(L, "up");
+    lua_pushboolean(L, player->up);
+    lua_settable(L, -3);
+    
+    lua_pushstring(L, "down");
+    lua_pushboolean(L, player->down);
+    lua_settable(L, -3);
+    
+    lua_pushstring(L, "jump");
+    lua_pushboolean(L, player->jump);
+    lua_settable(L, -3);
+    
+    return 1;
+}
+
+int player_getMouse(lua_State *L)
+{
+    check_resources(L);
+    
+    check_lua_argc(L, 0);
+    
+    lua_newtable(L);
+    
+    lua_pushstring(L, "lmb");
+    lua_pushboolean(L, player->lmb);
+    lua_settable(L, -3);
+    
+    lua_pushstring(L, "rmb");
+    lua_pushboolean(L, player->rmb);
+    lua_settable(L, -3);
+    
+    lua_pushstring(L, "x");
+    lua_pushnumber(L, player->mouse_pos.x);
+    lua_settable(L, -3);
+    
+    lua_pushstring(L, "y");
+    lua_pushnumber(L, player->mouse_pos.y);
+    lua_settable(L, -3);
+    
+    return 1;
+}
+
+int resources_loadTexture(lua_State *L)
+{
+    check_resources(L);
+    
+    check_lua_argc(L, 1);
+    
+    std::string name = get_lua_string(L, 1);
+    
+    textures->loadResource(name);
     
     return 0;
 }

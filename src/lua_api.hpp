@@ -4,6 +4,7 @@
 #include <lua.hpp>
 #include <iostream>
 #include <SFML/Graphics/Rect.hpp>
+#include <SFML/System/Vector2.hpp>
 #include <vector>
 
 #include "entitymgr.hpp"
@@ -11,12 +12,15 @@
 #include "world.hpp"
 #include "resource_holder.hpp"
 #include "animation.hpp"
+#include "player.hpp"
 
 // Resources required for API
 // There should be better way to access them...
 extern World *world;
 extern EntityManager *entmgr;
 extern TextureHolder *textures;
+extern Player *player;  // TODO - more players?
+
 
 // Utility functions
 
@@ -115,7 +119,7 @@ inline Entity *get_entity(lua_State *L, int id)
 // Checks is resources for api aviable, raises error if not
 inline void check_resources(lua_State *L)
 {
-    if (world == nullptr || entmgr == nullptr || textures == nullptr)
+    if (world == nullptr || entmgr == nullptr || textures == nullptr || player == nullptr)
     {
         luaL_error(L, "resources required for API are unaviable");
     }
@@ -298,6 +302,26 @@ int entity_getVelocity(lua_State *L);
 // void entity_delEntity(int)
 // Removes entity. First argument is entity id
 int entity_delEntity(lua_State *L);
+
+
+// Player interface
+
+// int player_getPlayerEntity()
+// Returns entity id of players entity. If player has no entity, 0 returned
+int player_getEntity(lua_State *L);
+
+// KeyPresses player_getPlayerKeys()
+// Returns key presses of player.
+// KeyPresses is a table with keys:
+// left, right, up, down, jump - booleans, meaning is player presses that keys or not
+int player_getKeys(lua_State *L);
+
+// Mouse player_getPlayerMouse()
+// Returns players mouse state.
+// Mouse is a table with keys:
+// lmb, rmb - booleans, meaning is player presses left or right mouse buttons
+// x, y - floats, mouse position in world (mouse position in window + camera position)
+int player_getMouse(lua_State *L);
 
 
 // Resources interface
