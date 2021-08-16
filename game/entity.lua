@@ -1,40 +1,71 @@
 -- Wraper for entity id. For easier entity control.
 -- I will change this to userdata. Later.
 local Entity = {
+    types = {}, -- Map for pairs 'entity type : init arguments'
+    entities = {}, -- Weak table for all created entities
 }
 
-function Entity.new(args)
-    return Entity.fromid(entity_newEntity(), args)
+setmetatable(Entity.entities, {__mode = 'v'})
+
+local types = 0
+
+-- Create new type of entity. If initargs is not nil, it will be used as args
+-- every time you call Entity.new with args "type" key.
+-- Return
+function Entity.newType(initargs)
+    types = types + 1
+    Entity.types[types] = initargs
+    return types
 end
 
 --[[ args are:
 {
-    is_ref = bool, -- If true, when __gc called do not delete entity and ignore all next arguments
+    type = int, -- If given, missing arguments would be replaced by values from Entity.types[type]
     x, y, width, height = float, -- Rect for entity
     texture = string, -- Texture name
     animations = AnimationsMap, -- Table with entity's animations
 }
 --]]
+function Entity.new(args)
+    if args ~= nil and args.type ~= nil and Entity.types[args.type] ~= nil then
+        local nargs = Entity.types[args.type] -- New args
+        
+        args.x = args.x or nargs.x
+        args.y = args.y or nargs.y
+        args.width = args.width or nargs.width
+        args.height = args.height or nargs.height
+        args.texture = args.texture or nargs.texture
+        args.animations = args.animations or nargs.animations
+    end
+
+    local entity = Entity.fromid(entity_newEntity(), args)
+    
+    Entity.entities[entity.id] = entity
+    
+    return entity
+end
 
 function Entity.fromid(id, args)
+    if Entity.entities[id] ~= nil then return Entity.entities[id] end
+
+    args = args or {}
+
     local entity = {
         id = id,
         mirrored = false,
-        is_ref = args.is_ref,
+        type = args.type or 0
     }
     
     setmetatable(entity, {__index = Entity})
     
-    args = args or {}
-    args.x = args.x or 0
-    args.y = args.y or 0
-    args.width = args.width or 32
-    args.height = args.height or 32
-    
-    if not args.is_ref then
-        entity:setPosition(args.x, args.y)
+    if not args.keep_attributes then
+        if args.x ~= nil and args.y ~= nil then
+            entity:setPosition(args.x, args.y)
+        end
         
-        entity:setSize(args.width, args.height)
+        if args.width ~= nil and args.height ~= nil then
+            entity:setSize(args.width, args.height)
+        end
         
         if args.texture ~= nil then
             entity:setTexture(args.texture)
@@ -46,6 +77,18 @@ function Entity.fromid(id, args)
     end
     
     return entity
+end
+
+function Entity.findByType(type)
+    local found = {}
+    
+    for _, entity in ipairs(Entity.entities) do
+        if entity.type == type then
+            found[#found+1] = entity
+        end
+    end
+    
+    return found
 end
 
 function Entity:setTexture(name)

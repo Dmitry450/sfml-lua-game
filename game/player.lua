@@ -9,7 +9,7 @@ local Player = {}
 setmetatable(Player, {__index = Entity})
 
 function Player.new()
-    local player = Entity.fromid(player_getEntity(), {is_ref = true})
+    local player = Entity.fromid(player_getEntity())
     setmetatable(player, {__index = Player})
     
     return player
