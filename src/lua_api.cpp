@@ -13,6 +13,8 @@ void api_init(lua_State *L)
     // API functions
     lua_register(L, "world_getAt",                 world_getAt);
     lua_register(L, "world_setAt",                 world_setAt);
+    lua_register(L, "world_setTilemap",            world_setTilemap);
+    lua_register(L, "world_setBlockFrame",         world_setBlockFrame);
     
     lua_register(L, "entity_newEntity",            entity_newEntity);
     lua_register(L, "entity_exists",               entity_exists);
@@ -136,6 +138,41 @@ int world_setAt(lua_State *L)
     }
     
     world->setAt(x, y, (uint8_t)block);
+    
+    return 0;
+}
+
+int world_setTilemap(lua_State *L)
+{
+    check_resources(L);
+    
+    check_lua_argc(L, 1);
+    
+    std::string filename = get_lua_string(L, 1);
+    
+    sf::Texture *texture = textures->getResource(filename);
+    
+    if (texture == nullptr)
+    {
+        luaL_error(L, "no such texture: %s", filename);
+    }
+    
+    world->setTilemap(texture);
+    
+    return 0;
+}
+
+int world_setBlockFrame(lua_State *L)
+{
+    check_resources(L);
+    
+    check_lua_argc(L, 3);
+    
+    int block = get_lua_integer(L, 1);
+    int x = get_lua_integer(L, 2);
+    int y = get_lua_integer(L, 3);
+    
+    world->setBlockFrame((uint8_t)block, x, y);
     
     return 0;
 }

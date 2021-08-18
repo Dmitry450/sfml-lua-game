@@ -24,7 +24,7 @@ void World::setAt(int x, int y, uint8_t block)
     world[y*width+x] = block;
 }
 
-void World::draw(sf::RenderTarget& target, sf::RenderStates states) const
+void World::draw(sf::RenderWindow &window)
 {
     sf::RectangleShape rect(sf::Vector2f(BLOCK_SIZE, BLOCK_SIZE));
     
@@ -34,10 +34,22 @@ void World::draw(sf::RenderTarget& target, sf::RenderStates states) const
     {
         for (int y = 0; y < height; y++)
         {
-            if (world[width*y+x] != BLOCK_AIR)
+            uint8_t block = world[width*y+x];
+            
+            if (block != BLOCK_AIR)
             {
-                rect.setPosition(x*BLOCK_SIZE - camera.x, y*BLOCK_SIZE - camera.y);
-                target.draw(rect);
+                if (tile.getTexture() != nullptr and block_frames.find(block) != block_frames.end())
+                {
+                    int *pos = block_frames.find(block)->second;
+                    tile.setTextureRect(sf::IntRect(pos[0]*BLOCK_SIZE, pos[1]*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE));
+                    tile.setPosition(x*BLOCK_SIZE - camera.x, y*BLOCK_SIZE - camera.y);
+                    window.draw(tile);
+                }
+                else
+                {
+                    rect.setPosition(x*BLOCK_SIZE - camera.x, y*BLOCK_SIZE - camera.y);
+                    window.draw(rect);
+                }
             }
         }
     }

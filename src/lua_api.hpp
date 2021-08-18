@@ -223,6 +223,15 @@ int world_getAt(lua_State *L);
 // is block id FROM 0 TO 255
 int world_setAt(lua_State *L);
 
+// void world_setTilemap(string)
+// Sets tilemap for world blocks. Be sure you called resources_loadTexture first
+int world_setTilemap(lua_State *L);
+
+// void world_setBlockFrame(int, int, int)
+// Sets tilemap position for block. Note that you dont need to multiply it by BLOCK_SIZE.
+// First argument is block id, FROM 2 TO 255 (excluding air and OOB, since they are not drawn)
+// last two are x and y position.
+int world_setBlockFrame(lua_State *L);
 
 // Entities interface
 
