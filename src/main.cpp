@@ -66,9 +66,6 @@ int main(int argc, char **argv)
     lua_State *L = luaL_newstate();
     
     api_init(L);
-    
-    if (!run_script(L, "main.lua"))
-        return EXIT_FAILURE;
 
     // BEGIN TEST PLAYER CODE
     PlayerParams params;
@@ -93,6 +90,9 @@ int main(int argc, char **argv)
     entmgr->addEntity(player->entity);
     
     // END TEST PLAYER CODE
+    
+    if (!run_script(L, "main.lua"))
+        return EXIT_FAILURE;
     
     sf::Clock clock;
     

@@ -1,10 +1,5 @@
 dofile("builtin.lua")
 
-local myentity
-local player
-
-local x = 0
-
 local ET_MYENTITY = Entity.newType({
     width = 32, height = 32,
     texture = "resources/char.png",
@@ -20,26 +15,27 @@ local ET_MYENTITY = Entity.newType({
     }
 })
 
-addHook("update", function(dtime)
-    if player == nil then
-        player = Player.new()
-        player:addAnimation("stand", {
-            time_per_frame = 999,
-            frames = 1,
-            x = 0,
-            y = 0,
-            width = 32,
-            height = 32,
-        })
-    end
 
-    if myentity == nil then
-        myentity = Entity.new({
-            x = 40, y = 40,
-            type = ET_MYENTITY,
-        })
-    end
-    
+local myentity = Entity.new({
+    x = 40, y = 40,
+    type = ET_MYENTITY,
+})
+
+
+local player = Player.new()
+
+player:addAnimation("stand", {
+    time_per_frame = 999,
+    frames = 1,
+    x = 0,
+    y = 0,
+    width = 32,
+    height = 32,
+})
+
+local x = 0
+
+addHook("update", function(dtime)
     local collide = myentity:getCollisionInfo()
     
     if not collide.blockd then
