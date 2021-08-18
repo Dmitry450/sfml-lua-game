@@ -199,6 +199,9 @@ int entity_exists(lua_State *L)
     check_lua_argc(L, 1);
     
     int id = get_lua_integer(L, 1);
+    
+    // No need to check for id == 0
+    
     Entity *entity = entmgr->getByID(id);
     
     lua_pushboolean(L, entity != nullptr);
@@ -213,6 +216,10 @@ int entity_setTexture(lua_State *L)
     check_lua_argc(L, 2);
     
     int id = get_lua_integer(L, 1);
+    
+    if (id == 0)
+        return 0;
+    
     std::string filename = lua_tostring(L, 2);
     
     sf::Texture *texture = textures->getResource(filename);
@@ -236,6 +243,10 @@ int entity_setAnimationsManager(lua_State *L)
     check_lua_argc(L, 2);
     
     int id = get_lua_integer(L, 1);
+    
+    if (id == 0)
+        return 0;
+    
     Entity *entity = get_entity(L, id);
     
     const int animations_idx = 2; // Absolute index in stack
@@ -264,6 +275,10 @@ int entity_addAnimation(lua_State *L)
     check_lua_argc(L, 3);
     
     int id = get_lua_integer(L, 1);
+    
+    if (id == 0)
+        return 0;
+    
     Entity *entity = get_entity(L, id);
     
     std::string name = get_lua_string(L, 2);
@@ -280,6 +295,10 @@ int entity_setAnimation(lua_State *L)
     bool has_mirror_arg = check_lua_argc2(L, 2, 3);
     
     int id = get_lua_integer(L, 1);
+    
+    if (id == 0)
+        return 0;
+    
     Entity *entity = get_entity(L, id);
     
     std::string name = get_lua_string(L, 2);
@@ -300,6 +319,10 @@ int entity_mirror(lua_State *L)
     bool has_mirror_arg = check_lua_argc2(L, 1, 2);
     
     int id = get_lua_integer(L, 1);
+    
+    if (id == 0)
+        return 0;
+    
     Entity *entity = get_entity(L, id);
     
     entity->animations.mirror = ( has_mirror_arg ? get_lua_bool(L, 2) : !entity->animations.mirror );
@@ -313,9 +336,11 @@ int entity_setPosition(lua_State *L)
     
     check_lua_argc(L, 3);
     
-    //std::cout<<lua_gettop(L);
-    
     int id = get_lua_integer(L, 1);
+    
+    if (id == 0)
+        return 0;
+    
     float x = get_lua_float(L, 2);
     float y = get_lua_float(L, 3);
     
@@ -333,6 +358,9 @@ int entity_getPosition(lua_State *L)
     check_lua_argc(L, 1);
     
     int id = get_lua_integer(L, 1);
+    
+    if (id == 0)
+        return 0;
     
     Entity *entity = get_entity(L, id);
     
@@ -358,6 +386,10 @@ int entity_setSize(lua_State *L)
     check_lua_argc(L, 3);
     
     int id = get_lua_integer(L, 1);
+    
+    if (id == 0)
+        return 0;
+    
     float w = get_lua_float(L, 2);
     float h = get_lua_float(L, 3);
     
@@ -375,6 +407,9 @@ int entity_getSize(lua_State *L)
     check_lua_argc(L, 1);
     
     int id = get_lua_integer(L, 1);
+    
+    if (id == 0)
+        return 0;
     
     Entity *entity = get_entity(L, id);
     
@@ -400,6 +435,9 @@ int entity_getCollisionInfo(lua_State *L)
     check_lua_argc(L, 1);
     
     int id = get_lua_integer(L, 1);
+    
+    if (id == 0)
+        return 0;
     
     Entity *entity = get_entity(L, id);
     
@@ -431,6 +469,10 @@ int entity_setVelocity(lua_State *L)
     check_lua_argc(L, 3);
     
     int id = get_lua_integer(L, 1);
+    
+    if (id == 0)
+        return 0;
+    
     float x = get_lua_float(L, 2);
     float y = get_lua_float(L, 3);
     
@@ -449,6 +491,9 @@ int entity_getVelocity(lua_State *L)
     check_lua_argc(L, 1);
     
     int id = get_lua_integer(L, 1);
+    
+    if (id == 0)
+        return 0;
     
     Entity *entity = get_entity(L, id);
     
@@ -472,6 +517,9 @@ int entity_delEntity(lua_State *L)
     check_lua_argc(L, 1);
     
     int id = get_lua_integer(L, 1);
+    
+    if (id == 0)
+        return 0;
     
     // Not using get_entity because we dont want to raise error if there is no entity
     Entity *entity = entmgr->getByID(id);

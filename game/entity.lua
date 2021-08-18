@@ -56,7 +56,7 @@ function Entity.fromid(id, args)
         type = args.type or 0
     }
     
-    setmetatable(entity, {__index = Entity})
+    entity = setmetatable(entity, {__index = Entity, __gc = Entity.kill})
     
     if not args.keep_attributes then
         if args.x ~= nil and args.y ~= nil then
@@ -149,18 +149,13 @@ function Entity:getSize()
     return entity_getSize(self.id)
 end
 
-function Entity:createRef()
-    return Entity.fromid(self.id, {is_ref = true})
-end
-
 function Entity:exists()
     return entity_exists(self.id)
 end
 
-function Entity:__gc()
-    if not self.is_ref then
-        entity_delEntity(self.id)
-    end
+function Entity:kill()
+    entity_delEntity(self.id)
+    self.id = 0
 end
 
 return Entity
