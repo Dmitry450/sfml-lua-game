@@ -216,17 +216,18 @@ int main(int argc, char **argv)
             
             run_fall_physics(player->entity, dtime, 320);
             run_player_controls(player->entity, dtime, params);
-
             
-            window.clear(sf::Color(40, 79, 23, 128));
+            window.clear(sf::Color(40, 24, 190, 128));
             
-            window.draw(*world);
+            world->draw(window);
             
             entmgr->draw(window);
         }
         
         window.display();
     }
+    
+    lua_close(L);
     
     return EXIT_SUCCESS;
 }
