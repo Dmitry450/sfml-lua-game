@@ -91,6 +91,26 @@ function Entity.findByType(type)
     return found
 end
 
+function Entity.entitiesToIds(entities)
+    local result = {}
+    
+    for _, entity in ipairs(entities) do
+        result[#result+1] = entity.id
+    end
+    
+    return result
+end
+
+function Entity.idsToEntities(ids)
+    local result = {}
+
+    for _, id in ipairs(ids) do
+        result[#result+1] = Entity.fromid(id)
+    end
+
+    return result
+end
+
 function Entity:setTexture(name)
     entity_setTexture(self.id, name)
 end
@@ -123,6 +143,18 @@ end
 
 function Entity:getCollisionInfo()
     return entity_getCollisionInfo(self.id)
+end
+
+function Entity:findCollisions()
+    return Entity.idsToEntities(entity_findCollisions(self.id))
+end
+
+function Entity:findCollisionsWith(entities)
+    return Entity.idsToEntities(entity_findCollisionsWith(self.id, Entity.entitiesToIds(entities)))
+end
+
+function Entity:isCollide(other)
+    return entity_isCollide(self.id, other.id)
 end
 
 function Entity:setPosition(x, y)

@@ -89,3 +89,11 @@ void Entity::onCollideY(int x, int y, World &world)
         velocity.y = 0;
     }
 }
+
+bool Entity::isCollideEntity(Entity *entity)
+{
+    if (entity == this)
+        return false;
+    
+    return rect.intersects(entity->rect);
+}

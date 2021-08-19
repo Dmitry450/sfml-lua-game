@@ -60,4 +60,9 @@ addHook("update", function(dtime)
     if x % 60 == 0 then
         myentity:mirror()
     end
+    
+    if myentity:isCollide(player) then
+        local v = myentity:getVelocity()
+        myentity:setVelocity(0, v.y - 32*20 * dtime)
+    end
 end)

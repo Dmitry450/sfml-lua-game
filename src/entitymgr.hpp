@@ -2,6 +2,7 @@
 #define ENTITYMGR_HPP
 
 #include <unordered_map>
+#include <vector>
 
 #include "entity.hpp"
 #include "world.hpp"
@@ -61,6 +62,47 @@ public:
         {
             it->second->draw(window);
         }
+    }
+    
+    std::vector<int> findCollisions(int id)
+    {
+        std::vector<int> result;
+        
+        Entity *entity = getByID(id);
+        
+        if (entity == nullptr)
+            return result;
+        
+        for (auto it = entities.begin(); it != entities.end(); ++it)
+        {
+            if (entity->isCollideEntity(it->second))
+                result.push_back(it->second->getID());
+        }
+        
+        return result;
+    }
+    
+    std::vector<int> findCollisions(int id, std::vector<int> &entities)
+    {
+        std::vector<int> result;
+        
+        Entity *entity = getByID(id);
+        
+        if (entity == nullptr)
+            return result;
+        
+        for (auto it = entities.begin(); it != entities.end(); ++it)
+        {
+            Entity *other = getByID(*it);
+            
+            if (other == nullptr)
+                continue;
+            
+            if (entity->isCollideEntity(other))
+                result.push_back(*it);
+        }
+        
+        return result;
     }
     
 private:

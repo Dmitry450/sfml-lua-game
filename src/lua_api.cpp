@@ -27,9 +27,12 @@ void api_init(lua_State *L)
     lua_register(L, "entity_getPosition",          entity_getPosition);
     lua_register(L, "entity_setSize",              entity_setSize);
     lua_register(L, "entity_getSize",              entity_getSize);
-    lua_register(L, "entity_getCollisionInfo",     entity_getCollisionInfo);
     lua_register(L, "entity_setVelocity",          entity_setVelocity);
     lua_register(L, "entity_getVelocity",          entity_getVelocity);
+    lua_register(L, "entity_getCollisionInfo",     entity_getCollisionInfo);
+    lua_register(L, "entity_findCollisions",       entity_findCollisions);
+    lua_register(L, "entity_findCollisionsWith",   entity_findCollisionsWith);
+    lua_register(L, "entity_isCollide",            entity_isCollide);
     lua_register(L, "entity_delEntity",            entity_delEntity);
     
     lua_register(L, "player_getEntity",            player_getEntity);
@@ -100,7 +103,10 @@ void run_update_hooks(lua_State *L, float dtime)
     while (lua_next(L, update_idx) != 0) // Pop key, push value and key
     {
         lua_pushnumber(L, dtime); // Push dtime
-        lua_call(L, 1, 0); // Pop dtime and value (function)
+        if (lua_pcall(L, 1, 0, 0) != LUA_OK) // Pop dtime and value (function)
+        {
+            printerr(L);
+        }
     }
     
     lua_pop(L, 2); // Pop hooks["update"] and hooks
@@ -428,40 +434,6 @@ int entity_getSize(lua_State *L)
     return 1;
 }
 
-int entity_getCollisionInfo(lua_State *L)
-{
-    check_resources(L);
-    
-    check_lua_argc(L, 1);
-    
-    int id = get_lua_integer(L, 1);
-    
-    if (id == 0)
-        return 0;
-    
-    Entity *entity = get_entity(L, id);
-    
-    lua_newtable(L);
-    
-    lua_pushstring(L, "blockl");
-    lua_pushboolean(L, entity->collision_info.blockl);
-    lua_settable(L, -3);
-    
-    lua_pushstring(L, "blockr");
-    lua_pushboolean(L, entity->collision_info.blockr);
-    lua_settable(L, -3);
-    
-    lua_pushstring(L, "blocku");
-    lua_pushboolean(L, entity->collision_info.blocku);
-    lua_settable(L, -3);
-    
-    lua_pushstring(L, "blockd");
-    lua_pushboolean(L, entity->collision_info.blockd);
-    lua_settable(L, -3);
-    
-    return 1;
-}
-
 int entity_setVelocity(lua_State *L)
 {
     check_resources(L);
@@ -506,6 +478,117 @@ int entity_getVelocity(lua_State *L)
     lua_pushstring(L, "y");
     lua_pushnumber(L, entity->velocity.y);
     lua_settable(L, -3);
+    
+    return 1;
+}
+
+int entity_getCollisionInfo(lua_State *L)
+{
+    check_resources(L);
+    
+    check_lua_argc(L, 1);
+    
+    int id = get_lua_integer(L, 1);
+    
+    if (id == 0)
+        return 0;
+    
+    Entity *entity = get_entity(L, id);
+    
+    lua_newtable(L);
+    
+    lua_pushstring(L, "blockl");
+    lua_pushboolean(L, entity->collision_info.blockl);
+    lua_settable(L, -3);
+    
+    lua_pushstring(L, "blockr");
+    lua_pushboolean(L, entity->collision_info.blockr);
+    lua_settable(L, -3);
+    
+    lua_pushstring(L, "blocku");
+    lua_pushboolean(L, entity->collision_info.blocku);
+    lua_settable(L, -3);
+    
+    lua_pushstring(L, "blockd");
+    lua_pushboolean(L, entity->collision_info.blockd);
+    lua_settable(L, -3);
+    
+    return 1;
+}
+
+int entity_findCollisions(lua_State *L)
+{
+    check_resources(L);
+    
+    check_lua_argc(L, 1);
+    
+    int id = get_lua_integer(L, 1);
+    
+    if (id == 0)
+        return 0;
+    
+    auto result = entmgr->findCollisions(id);
+    
+    lua_newtable(L);
+    
+    for (unsigned int i = 1; i <= result.size(); ++i)
+    {
+        lua_pushinteger(L, (int)i);
+        lua_pushinteger(L, result[i]);
+        lua_settable(L, -3);
+    }
+    
+    return 1;
+}
+
+int entity_findCollisionsWith(lua_State *L)
+{
+    check_resources(L);
+    
+    check_lua_argc(L, 2);
+    
+    int id = get_lua_integer(L, 1);
+    
+    if (id == 0)
+        return 0;
+    
+    std::vector<int> input;
+    std::vector<int> result;
+    
+    lua_pushnil(L);
+    while (lua_next(L, 2) != 0)
+    {
+        input.push_back(get_lua_integer(L, -1));
+        lua_pop(L, 1);
+    }
+    
+    result = entmgr->findCollisions(id, input);
+    
+    lua_newtable(L);
+    
+    for (unsigned int i = 1; i <= result.size(); ++i)
+    {
+        lua_pushinteger(L, (int)i);
+        lua_pushinteger(L, result[i]);
+        lua_settable(L, -3);
+    }
+    
+    return 1;
+}
+
+int entity_isCollide(lua_State *L)
+{
+    check_resources(L);
+    
+    check_lua_argc(L, 2);
+    
+    int id1 = get_lua_integer(L, 1);
+    int id2 = get_lua_integer(L, 2);
+    
+    Entity *entity1 = get_entity(L, id1);
+    Entity *entity2 = get_entity(L, id2);
+    
+    lua_pushboolean(L, entity1->isCollideEntity(entity2));
     
     return 1;
 }

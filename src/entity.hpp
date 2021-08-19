@@ -69,6 +69,8 @@ public:
     void onCollideX(int x, int y, World &world);
     void onCollideY(int x, int y, World &world);
     
+    bool isCollideEntity(Entity *entity);
+    
     void draw(sf::RenderWindow &window);
 
 public:

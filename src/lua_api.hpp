@@ -293,13 +293,6 @@ int entity_setSize(lua_State *L);
 // Returns entitys width and height in table Size. First argument is entity id
 int entity_getSize(lua_State *L);
 
-// CollisionInfo entity_getCollisionInfo(int)
-// Returns world collision info for entity. First argument is entity id.
-// CollisionInfo is a table with keys:
-// blockl, blockr, blocku, blockd - booleans, for left, right, up and down blocks
-// that collide with entity
-int entity_getCollisionInfo(lua_State *L);
-
 // void entity_setVelocity(int, float, float)
 // Set entity's velocity. First argument is entity id, other two are x and y velocity
 int entity_setVelocity(lua_State *L);
@@ -307,6 +300,25 @@ int entity_setVelocity(lua_State *L);
 // Vector2f entity_getVelocity(int)
 // Returns entity's x and y velocity in table Vector2f. First argument is entity id
 int entity_getVelocity(lua_State *L);
+
+// CollisionInfo entity_getCollisionInfo(int)
+// Returns world collision info for entity. First argument is entity id.
+// CollisionInfo is a table with keys:
+// blockl, blockr, blocku, blockd - booleans, for left, right, up and down blocks
+// that collide with entity
+int entity_getCollisionInfo(lua_State *L);
+
+// intlist entity_findCollisions(int)
+// Returns list of entity ids that collide with specified entity
+int entity_findCollisions(lua_State *L);
+
+// intlist entity_findCollisionsWith(int, intlist)
+// Same as above, but finds collisions only with entities specified in second argument
+int entity_findCollisionsWith(lua_State *L);
+
+// bool entity_isCollide(int, int)
+// Returns is two entity collide.
+int entity_isCollide(lua_State *L);
 
 // void entity_delEntity(int)
 // Removes entity. First argument is entity id
