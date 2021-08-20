@@ -118,8 +118,8 @@ int world_getAt(lua_State *L)
     
     check_lua_argc(L, 2);
     
-    int x = get_lua_integer(L, 1);
-    int y = get_lua_integer(L, 2);
+    int x = luaL_checkinteger(L, 1);
+    int y = luaL_checkinteger(L, 2);
     
     lua_pushinteger(L, world->getAt(x, y));
     
@@ -134,9 +134,9 @@ int world_setAt(lua_State *L)
     
     int x, y, block;
     
-    x = get_lua_integer(L, 1);
-    y = get_lua_integer(L, 2);
-    block = get_lua_integer(L, 3);
+    x = luaL_checkinteger(L, 1);
+    y = luaL_checkinteger(L, 2);
+    block = luaL_checkinteger(L, 3);
     
     if (block < 0 || block > 255)
     {
@@ -154,7 +154,7 @@ int world_setTilemap(lua_State *L)
     
     check_lua_argc(L, 1);
     
-    std::string filename = get_lua_string(L, 1);
+    std::string filename = luaL_checkstring(L, 1);
     
     sf::Texture *texture = textures->getResource(filename);
     
@@ -174,9 +174,9 @@ int world_setBlockFrame(lua_State *L)
     
     check_lua_argc(L, 3);
     
-    int block = get_lua_integer(L, 1);
-    int x = get_lua_integer(L, 2);
-    int y = get_lua_integer(L, 3);
+    int block = luaL_checkinteger(L, 1);
+    int x = luaL_checkinteger(L, 2);
+    int y = luaL_checkinteger(L, 3);
     
     world->setBlockFrame((uint8_t)block, x, y);
     
@@ -204,7 +204,7 @@ int entity_exists(lua_State *L)
     
     check_lua_argc(L, 1);
     
-    int id = get_lua_integer(L, 1);
+    int id = luaL_checkinteger(L, 1);
     
     // No need to check for id == 0
     
@@ -221,12 +221,12 @@ int entity_setTexture(lua_State *L)
     
     check_lua_argc(L, 2);
     
-    int id = get_lua_integer(L, 1);
+    int id = luaL_checkinteger(L, 1);
     
     if (id == 0)
         return 0;
     
-    std::string filename = lua_tostring(L, 2);
+    std::string filename = luaL_checkstring(L, 2);
     
     sf::Texture *texture = textures->getResource(filename);
     
@@ -248,7 +248,7 @@ int entity_setAnimationsManager(lua_State *L)
     
     check_lua_argc(L, 2);
     
-    int id = get_lua_integer(L, 1);
+    int id = luaL_checkinteger(L, 1);
     
     if (id == 0)
         return 0;
@@ -262,7 +262,7 @@ int entity_setAnimationsManager(lua_State *L)
     lua_pushnil(L); // Push first key
     while (lua_next(L, animations_idx) != 0) // Pop key, push key and value
     {
-        std::string name = get_lua_string(L, -2);  // Get key
+        std::string name = luaL_checkstring(L, -2);  // Get key
         
         construct_animation(L, name, animations);  // Stack stays same
         
@@ -280,14 +280,14 @@ int entity_addAnimation(lua_State *L)
     
     check_lua_argc(L, 3);
     
-    int id = get_lua_integer(L, 1);
+    int id = luaL_checkinteger(L, 1);
     
     if (id == 0)
         return 0;
     
     Entity *entity = get_entity(L, id);
     
-    std::string name = get_lua_string(L, 2);
+    std::string name = luaL_checkstring(L, 2);
     
     construct_animation(L, name, entity->animations);
     
@@ -300,20 +300,20 @@ int entity_setAnimation(lua_State *L)
     
     bool has_mirror_arg = check_lua_argc2(L, 2, 3);
     
-    int id = get_lua_integer(L, 1);
+    int id = luaL_checkinteger(L, 1);
     
     if (id == 0)
         return 0;
     
     Entity *entity = get_entity(L, id);
     
-    std::string name = get_lua_string(L, 2);
+    std::string name = luaL_checkstring(L, 2);
     
     if (entity->animations.hasAnimation(name))
         entity->animations.setAnimation(name);
     
     if (has_mirror_arg)
-        entity->animations.mirror = get_lua_bool(L, 3);
+        entity->animations.mirror = luaL_checkinteger(L, 3);
     
     return 0;
 }
@@ -324,14 +324,14 @@ int entity_mirror(lua_State *L)
     
     bool has_mirror_arg = check_lua_argc2(L, 1, 2);
     
-    int id = get_lua_integer(L, 1);
+    int id = luaL_checkinteger(L, 1);
     
     if (id == 0)
         return 0;
     
     Entity *entity = get_entity(L, id);
     
-    entity->animations.mirror = ( has_mirror_arg ? get_lua_bool(L, 2) : !entity->animations.mirror );
+    entity->animations.mirror = ( has_mirror_arg ? luaL_checkinteger(L, 2) : !entity->animations.mirror );
     
     return 0;
 }
@@ -342,13 +342,13 @@ int entity_setPosition(lua_State *L)
     
     check_lua_argc(L, 3);
     
-    int id = get_lua_integer(L, 1);
+    int id = luaL_checkinteger(L, 1);
     
     if (id == 0)
         return 0;
     
-    float x = get_lua_float(L, 2);
-    float y = get_lua_float(L, 3);
+    float x = luaL_checknumber(L, 2);
+    float y = luaL_checknumber(L, 3);
     
     Entity *entity = get_entity(L, id);
     
@@ -363,7 +363,7 @@ int entity_getPosition(lua_State *L)
     
     check_lua_argc(L, 1);
     
-    int id = get_lua_integer(L, 1);
+    int id = luaL_checkinteger(L, 1);
     
     if (id == 0)
         return 0;
@@ -391,13 +391,13 @@ int entity_setSize(lua_State *L)
     
     check_lua_argc(L, 3);
     
-    int id = get_lua_integer(L, 1);
+    int id = luaL_checkinteger(L, 1);
     
     if (id == 0)
         return 0;
     
-    float w = get_lua_float(L, 2);
-    float h = get_lua_float(L, 3);
+    float w = luaL_checknumber(L, 2);
+    float h = luaL_checknumber(L, 3);
     
     Entity *entity = get_entity(L, id);
     
@@ -412,7 +412,7 @@ int entity_getSize(lua_State *L)
     
     check_lua_argc(L, 1);
     
-    int id = get_lua_integer(L, 1);
+    int id = luaL_checkinteger(L, 1);
     
     if (id == 0)
         return 0;
@@ -440,13 +440,13 @@ int entity_setVelocity(lua_State *L)
     
     check_lua_argc(L, 3);
     
-    int id = get_lua_integer(L, 1);
+    int id = luaL_checkinteger(L, 1);
     
     if (id == 0)
         return 0;
     
-    float x = get_lua_float(L, 2);
-    float y = get_lua_float(L, 3);
+    float x = luaL_checknumber(L, 2);
+    float y = luaL_checknumber(L, 3);
     
     Entity *entity = get_entity(L, id);
     
@@ -462,7 +462,7 @@ int entity_getVelocity(lua_State *L)
     
     check_lua_argc(L, 1);
     
-    int id = get_lua_integer(L, 1);
+    int id = luaL_checkinteger(L, 1);
     
     if (id == 0)
         return 0;
@@ -488,7 +488,7 @@ int entity_getCollisionInfo(lua_State *L)
     
     check_lua_argc(L, 1);
     
-    int id = get_lua_integer(L, 1);
+    int id = luaL_checkinteger(L, 1);
     
     if (id == 0)
         return 0;
@@ -522,7 +522,7 @@ int entity_findCollisions(lua_State *L)
     
     check_lua_argc(L, 1);
     
-    int id = get_lua_integer(L, 1);
+    int id = luaL_checkinteger(L, 1);
     
     if (id == 0)
         return 0;
@@ -547,7 +547,7 @@ int entity_findCollisionsWith(lua_State *L)
     
     check_lua_argc(L, 2);
     
-    int id = get_lua_integer(L, 1);
+    int id = luaL_checkinteger(L, 1);
     
     if (id == 0)
         return 0;
@@ -558,7 +558,7 @@ int entity_findCollisionsWith(lua_State *L)
     lua_pushnil(L);
     while (lua_next(L, 2) != 0)
     {
-        input.push_back(get_lua_integer(L, -1));
+        input.push_back(luaL_checkinteger(L, -1));
         lua_pop(L, 1);
     }
     
@@ -582,8 +582,8 @@ int entity_isCollide(lua_State *L)
     
     check_lua_argc(L, 2);
     
-    int id1 = get_lua_integer(L, 1);
-    int id2 = get_lua_integer(L, 2);
+    int id1 = luaL_checkinteger(L, 1);
+    int id2 = luaL_checkinteger(L, 2);
     
     Entity *entity1 = get_entity(L, id1);
     Entity *entity2 = get_entity(L, id2);
@@ -599,7 +599,7 @@ int entity_delEntity(lua_State *L)
     
     check_lua_argc(L, 1);
     
-    int id = get_lua_integer(L, 1);
+    int id = luaL_checkinteger(L, 1);
     
     if (id == 0)
         return 0;
@@ -695,7 +695,7 @@ int resources_loadTexture(lua_State *L)
     
     check_lua_argc(L, 1);
     
-    std::string name = get_lua_string(L, 1);
+    std::string name = luaL_checkstring(L, 1);
     
     textures->loadResource(name);
     

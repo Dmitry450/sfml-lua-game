@@ -47,62 +47,6 @@ inline bool check_lua_argc2(lua_State *L, int rargc1, int rargc2)
     return argc == rargc2;
 }
 
-// Gets integer from stack, raises error if unable to
-inline int get_lua_integer(lua_State *L, int i)
-{
-    int success = 0;
-    int result;
-    
-    result = lua_tointegerx(L, i, &success);
-    
-    if (!success)
-    {
-        luaL_error(L, "stack[%I] expected to be an integer", i);
-    }
-    
-    return result;
-}
-
-// Gets float from stack, raises error if unable to
-inline float get_lua_float(lua_State *L, int i)
-{
-    int success = 0;
-    float result;
-    
-    result = lua_tonumberx(L, i, &success);
-    
-    if (!success)
-    {
-        luaL_error(L, "stack[%I] expected to be a float", i);
-    }
-    
-    return result;
-}
-
-// Gets boolean from stack, raises error if unable to
-inline bool get_lua_bool(lua_State *L, int i)
-{
-    if (!lua_isboolean(L, i))
-    {
-        luaL_error(L, "stack[%I] expected to be a boolean", i);
-    }
-    
-    return lua_toboolean(L, i);
-}
-
-// Gets string from stack, raises error if unable to
-// This function is safe to use while iterating through table with lua_next,
-// since it just won't load any value if it is not a string
-inline const char *get_lua_string(lua_State *L, int i)
-{
-    if (!lua_isstring(L, i))
-    {
-        luaL_error(L, "stack[%I] expected to be a string", i);
-    }
-    
-    return lua_tostring(L, i);
-}
-
 // Gets entity from manager, raises error if unable to
 inline Entity *get_entity(lua_State *L, int id)
 {
@@ -142,7 +86,7 @@ inline void construct_animation(lua_State *L, std::string &name, AnimationManage
     lua_pushstring(L, "time_per_frame"); // Push key
     lua_gettable(L, -2); // Pop key, push value[key]
     
-    time_per_frame = get_lua_float(L, -1);
+    time_per_frame = luaL_checknumber(L, -1);
     
     lua_pop(L, 1); // Pop value[key]
     
@@ -150,7 +94,7 @@ inline void construct_animation(lua_State *L, std::string &name, AnimationManage
     lua_pushstring(L, "x"); // Push key
     lua_gettable(L, -2); // Pop key, push value[key]
     
-    x = get_lua_integer(L, -1);
+    x = luaL_checkinteger(L, -1);
     
     lua_pop(L, 1); // Pop value[key]
     
@@ -158,7 +102,7 @@ inline void construct_animation(lua_State *L, std::string &name, AnimationManage
     lua_pushstring(L, "y"); // Push key
     lua_gettable(L, -2); // Pop key, push value[key]
     
-    y = get_lua_integer(L, -1);
+    y = luaL_checkinteger(L, -1);
     
     lua_pop(L, 1); // Pop value[key]
     
@@ -166,7 +110,7 @@ inline void construct_animation(lua_State *L, std::string &name, AnimationManage
     lua_pushstring(L, "width"); // Push key
     lua_gettable(L, -2); // Pop key, push value[key]
     
-    width = get_lua_integer(L, -1);
+    width = luaL_checkinteger(L, -1);
     
     lua_pop(L, 1); // Pop value[key]
     
@@ -174,7 +118,7 @@ inline void construct_animation(lua_State *L, std::string &name, AnimationManage
     lua_pushstring(L, "height"); // Push key
     lua_gettable(L, -2); // Pop key, push value[key]
     
-    height = get_lua_integer(L, -1);
+    height = luaL_checkinteger(L, -1);
     
     lua_pop(L, 1); // Pop value[key]
     
@@ -182,7 +126,7 @@ inline void construct_animation(lua_State *L, std::string &name, AnimationManage
     lua_pushstring(L, "frames"); // Push key
     lua_gettable(L, -2); // Pop key, push value[key]
     
-    frames = get_lua_integer(L, -1);
+    frames = luaL_checkinteger(L, -1);
     
     lua_pop(L, 1); // Pop value[key]
     
