@@ -6,18 +6,31 @@
 
 #define BLOCK_SIZE 32
 
-#include <stdint.h>
+#include <cstdint>
 #include <unordered_map>
 #include <SFML/Graphics.hpp>
+#include <vector>
+
+struct MapObject
+{
+    int x, y;
+    std::string name;
+    
+    MapObject(int _x, int _y, std::string &_name):
+        x(_x),
+        y(_y),
+        name(_name)
+    {}
+};
 
 class World
 {
 public:
-    World(uint8_t *world, int width, int height);
+    World(uint8_t *world, uint32_t width, uint32_t height);
     
-    uint8_t getAt(int x, int y);
+    uint8_t getAt(uint32_t x, uint32_t y);
     
-    void setAt(int x, int y, uint8_t block);
+    void setAt(uint32_t x, uint32_t y, uint8_t block);
     
     void setTilemap(sf::Texture *texture)
     {
@@ -41,10 +54,16 @@ public:
         block_frames[block][1] = y;
     }
     
+    void resize(uint32_t new_width, uint32_t new_height, bool save_old);
+    
+    std::vector<MapObject*> load(std::istream &in, uint32_t size);
+    
+    void save(std::ostream &out, std::vector<MapObject*> &map_objects);
+    
     void draw(sf::RenderWindow &window);
 private:
     uint8_t *world;
-    int width, height;
+    uint32_t width, height;
     
     std::unordered_map<uint8_t, int*> block_frames;
     sf::Sprite tile;
