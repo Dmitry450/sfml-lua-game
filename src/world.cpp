@@ -130,6 +130,7 @@ void World::draw(sf::RenderWindow &window)
 {
     sf::RectangleShape rect(sf::Vector2f(BLOCK_SIZE, BLOCK_SIZE));
     
+    
     rect.setFillColor(sf::Color::Red);
     
     for (uint32_t x = 0; x < width; x++)
@@ -144,12 +145,12 @@ void World::draw(sf::RenderWindow &window)
                 {
                     int *pos = block_frames.find(block)->second;
                     tile.setTextureRect(sf::IntRect(pos[0]*BLOCK_SIZE, pos[1]*BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE));
-                    tile.setPosition(x*BLOCK_SIZE - camera.x, y*BLOCK_SIZE - camera.y);
+                    tile.setPosition(x*BLOCK_SIZE - (float)camera.x, y*BLOCK_SIZE - (float)camera.y);
                     window.draw(tile);
                 }
                 else
                 {
-                    rect.setPosition(x*BLOCK_SIZE - camera.x, y*BLOCK_SIZE - camera.y);
+                    rect.setPosition(x*BLOCK_SIZE - (float)camera.x, y*BLOCK_SIZE - (float)camera.y);
                     window.draw(rect);
                 }
             }
