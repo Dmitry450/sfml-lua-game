@@ -35,10 +35,15 @@ void Entity::draw(sf::RenderWindow &window)
 
 void Entity::collide(World &world, bool by_x)
 {
-    collision_info.blockl = false;
-    collision_info.blockr = false;
-    collision_info.blocku = false;
-    collision_info.blockd = false;
+    if (by_x)
+    {
+        collision_info.blockl = false;
+        collision_info.blockr = false;
+    else
+    {
+        collision_info.blocku = false;
+        collision_info.blockd = false;
+    }
     
     for (int y = rect.top/BLOCK_SIZE; y < (rect.top + rect.height)/BLOCK_SIZE; y++)
     {
