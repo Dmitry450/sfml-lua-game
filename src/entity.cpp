@@ -39,6 +39,7 @@ void Entity::collide(World &world, bool by_x)
     {
         collision_info.blockl = false;
         collision_info.blockr = false;
+    }
     else
     {
         collision_info.blocku = false;
